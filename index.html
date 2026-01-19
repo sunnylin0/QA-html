@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QA 回報與修正系統</title>
+</head>
+
+<body>
+  <div id="app">
+    <header>
+      <h1>QA 系統</h1>
+      <nav>
+        <button id="tab-report" class="active">回報問題</button>
+        <button id="tab-list">修正列表</button>
+      </nav>
+    </header>
+
+    <main>
+      <!-- Report Section -->
+      <section id="section-report" class="active">
+        <div class="card">
+          <h2>新增問題回報</h2>
+          <form id="report-form">
+            <div class="row">
+              <div class="group">
+                <label>模組 (Module)</label>
+                <input type="text" name="module" placeholder="例如: 其他管理" required />
+              </div>
+              <div class="group">
+                <label>功能名稱 (Function)</label>
+                <input type="text" name="functionName" placeholder="例如: 供應者評鑑" required />
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="group">
+                <label>功能代號 (Code)</label>
+                <input type="text" name="code" placeholder="例如: P020208" required />
+              </div>
+              <div class="group">
+                <label>連結 (URL)</label>
+                <input type="url" name="url" placeholder="http://..." />
+              </div>
+            </div>
+
+            <div class="group">
+              <label>回報人員 (Reporter)</label>
+              <input type="text" name="reporter" id="reporter-input" placeholder="您的姓名" required />
+            </div>
+
+            <div class="group">
+              <label>問題描述 (Description)</label>
+              <textarea name="description" rows="5" placeholder="請詳細描述測試日期、問題內容..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary">送出回報</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- List Section -->
+      <section id="section-list">
+        <div class="filter-bar">
+          <input type="text" id="search-input" placeholder="搜尋關鍵字..." />
+          <select id="status-filter">
+            <option value="All">全部狀態</option>
+            <option value="New">未解決 (New)</option>
+            <option value="Fixed">已修正 (Fixed)</option>
+            <option value="Closed">已結案 (Closed)</option>
+          </select>
+          <div class="view-toggle">
+            <button id="btn-view-card" class="active" title="卡片檢視">▤</button>
+            <button id="btn-view-list" title="清單檢視">☰</button>
+          </div>
+          <button id="btn-refresh">重新整理</button>
+        </div>
+        <div id="loading" class="hidden">載入中...</div>
+        <div id="issue-grid" class="view-card">
+          <!-- Cards will be injected here -->
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Fix Modal -->
+  <div id="modal-fix" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h3>問題修正</h3>
+      <h2 id="modal-issue-info" class="modal-subject"></h2>
+      <form id="fix-form">
+        <div class="group">
+          <label>狀態 (Status)</label>
+          <select name="status" id="modal-status">
+            <option value="New">New (未解決)</option>
+            <option value="Fixed">Fixed (已修正)</option>
+            <option value="Closed">Closed (已結案)</option>
+          </select>
+        </div>
+        <div class="group">
+          <label>修正人員 (Fixer)</label>
+          <input type="text" name="fixer" id="modal-fixer" placeholder="工程師姓名" required />
+        </div>
+        <div class="group">
+          <label>修正說明 (Fix Note)</label>
+          <textarea name="fixNote" id="modal-fixNote" rows="3" placeholder="修正內容說明..."></textarea>
+        </div>
+        <button type="submit" class="btn-primary">更新狀態</button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>
