@@ -14,7 +14,8 @@
     - **H**: `Description`
     - **I**: `Fixer`
     - **J**: `FixNote`
-    - **K**: `Timestamp`
+    - **K**: `Timestamp` (回報時間)
+    - **L**: `FixTime` (修正時間)
 
 ## 步驟 2：加入程式碼
 1. 在試算表中，點選上方選單的 **「擴充功能」 (Extensions)** > **「Apps Script」**。

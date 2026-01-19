@@ -24,10 +24,9 @@ function doPost(e) {
     var action = params.action;
     
     if (action === 'create') {
-      var id = new Date().getTime().toString().slice(-6); // Simple random ID
-      var timestamp = new Date().toLocaleString();
-      // Columns: ID, Status, Module, Function, Code, Url, Reporter, Description, Fixer, FixNote, Timestamp
-      // Index:   0,  1,      2,      3,        4,    5,   6,        7,           8,     9,       10
+      var id = new Date().getTime().toString().slice(-6);
+      // Use provided timestamp or current server time
+      var timestamp = params.timestamp || new Date().toLocaleString();
       
       sheet.appendRow([
         id, 
@@ -40,13 +39,14 @@ function doPost(e) {
         params.description, 
         '', // Fixer
         '', // FixNote
-        timestamp
+        timestamp,
+        ''  // FixTime (Empty on create)
       ]);
       
       return responseJSON({ status: 'success', message: 'Reported successfully' });
     } 
     
-    else if (action === 'update') {
+    else if (action === 'update' || action === 'delete') {
       var id = params.id;
       var data = sheet.getDataRange().getValues();
       var rowIndex = -1;
@@ -60,12 +60,53 @@ function doPost(e) {
       }
       
       if (rowIndex > 0) {
-        // Update Status (Col 2/B), Fixer (Col 9/I), FixNote (Col 10/J)
-        sheet.getRange(rowIndex, 2).setValue(params.status);
-        sheet.getRange(rowIndex, 9).setValue(params.fixer);
-        sheet.getRange(rowIndex, 10).setValue(params.fixNote);
-        
-        return responseJSON({ status: 'success', message: 'Updated successfully' });
+        if (action === 'delete') {
+          sheet.deleteRow(rowIndex);
+          return responseJSON({ status: 'success', message: 'Deleted successfully' });
+        }
+        else if (action === 'update') {
+          // If params contains report fields (Module, Function, etc.), update them
+          // We check if specific fields exist in params to decide what to update
+          // But to be safe, we can just update everything if provided, or fallback to existing
+          
+          // Helper to get value or keep existing. 
+          // Note: data[i] is the row array (0-based)
+          var currentRow = data[rowIndex - 1]; 
+          
+          var vals = [
+             // Col 1: ID (Skip)
+             // Col 2: Status
+             params.status || currentRow[1],
+             // Col 3: Module
+             params.module || currentRow[2],
+             // Col 4: Function
+             params.functionName || currentRow[3],
+             // Col 5: Code
+             params.code || currentRow[4],
+             // Col 6: Url
+             params.url || currentRow[5],
+             // Col 7: Reporter
+             params.reporter || currentRow[6],
+             // Col 8: Description
+             params.description || currentRow[7],
+             // Col 9: Fixer
+             params.fixer || currentRow[8],
+             // Col 10: FixNote
+             params.fixNote || currentRow[9],
+             // Col 11: Timestamp (Report Time)
+             params.timestamp || currentRow[10],
+             // Col 12: FixTime
+             params.fixTime || currentRow[11]
+          ];
+
+          // Write back columns B to L (Index 2 to 12 in 1-based notation)
+          // Range: Row, Column, NumRows, NumColumns
+          // We want to write specific cells or the whole row. 
+          // Set values for Col B (2) to L (12). Length is 11.
+          sheet.getRange(rowIndex, 2, 1, 11).setValues([vals]);
+          
+          return responseJSON({ status: 'success', message: 'Updated successfully' });
+        }
       } else {
         return responseJSON({ status: 'error', message: 'ID not found' });
       }
