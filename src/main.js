@@ -434,7 +434,7 @@ function renderIssues(reFilter = true, resetPage = true) {
         const term = searchInput.value.toLowerCase();
         filteredIssues = issues.filter(issue => {
             if (currentFilter !== 'All' && issue.Status !== currentFilter) return false;
-            const searchString = `${issue.Module} ${issue.Function} ${issue.Description} ${issue.Reporter}`.toLowerCase();
+            const searchString = `${issue.ID} ${issue.Code} ${issue.Module} ${issue.Function} ${issue.Description} ${issue.Reporter} ${issue.Fixer} ${issue.FixNote}`.toLowerCase();
             return searchString.includes(term);
         });
     }
@@ -500,6 +500,13 @@ function openFixModal(issue) {
     fixForm.dataset.id = issue.ID;
 
     modalMeta.textContent = `正在編輯: ${issue.Module} - ${issue.Function} (ID: ${issue.ID})`;
+
+    // Populate URL if exists
+    const urlContainer = document.getElementById('modal-url-container');
+    urlContainer.innerHTML = '';
+    if (issue.Url && issue.Url.startsWith('http')) {
+        urlContainer.innerHTML = `<a href="${issue.Url}" target="_blank" class="btn-link" style="display:inline-block; width:auto; padding:0.5rem 1rem;">開啟連結 ↗</a>`;
+    }
 
     document.getElementById('modal-status').value = issue.Status;
     document.getElementById('modal-timestamp').value = issue.Timestamp || ''; // Report Time

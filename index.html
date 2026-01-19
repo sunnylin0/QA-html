@@ -94,7 +94,9 @@
       <!-- List Section -->
       <section id="section-list">
         <div class="filter-bar">
-          <input type="text" id="search-input" placeholder="搜尋關鍵字..." />
+          <div id="status-find">
+            <input type="text" id="search-input" placeholder="搜尋關鍵字..." />
+          </div>
           <select id="status-filter">
             <option value="All">全部狀態</option>
             <option value="New">未解決 (New)</option>
@@ -108,6 +110,27 @@
           <button id="btn-refresh">重新整理</button>
         </div>
         <div id="loading" class="hidden">載入中...</div>
+
+        <!-- Pagination Controls -->
+        <div id="pagination-controls" class="hidden"
+          style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+          <div class="page-size">
+            顯示
+            <select id="items-per-page">
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+            筆 / 頁
+          </div>
+          <div class="page-nav" style="display: flex; gap: 0.5rem; align-items: center;">
+            <button id="btn-prev" class="btn-sm">上一頁</button>
+            <span id="page-info">Page 1 of 1</span>
+            <button id="btn-next" class="btn-sm">下一頁</button>
+          </div>
+        </div>
+
         <div id="issue-grid" class="view-card">
           <!-- Cards will be injected here -->
         </div>
@@ -121,6 +144,7 @@
       <span class="close-modal">&times;</span>
       <h3>問題修正</h3>
       <h2 id="modal-issue-info" class="modal-subject"></h2>
+      <div id="modal-url-container" style="margin-bottom: 1rem;"></div>
       <form id="fix-form">
         <div class="row">
           <div class="group">
@@ -151,26 +175,6 @@
 
         <button type="submit" class="btn-primary">更新狀態</button>
       </form>
-    </div>
-  </div>
-
-  <!-- Pagination Controls -->
-  <div id="pagination-controls" class="hidden"
-    style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-    <div class="page-size">
-      顯示
-      <select id="items-per-page">
-        <option value="10">10</option>
-        <option value="20">20</option>
-        <option value="50">50</option>
-        <option value="100">100</option>
-      </select>
-      筆 / 頁
-    </div>
-    <div class="page-nav" style="display: flex; gap: 0.5rem; align-items: center;">
-      <button id="btn-prev" class="btn-sm">上一頁</button>
-      <span id="page-info">Page 1 of 1</span>
-      <button id="btn-next" class="btn-sm">下一頁</button>
     </div>
   </div>
 

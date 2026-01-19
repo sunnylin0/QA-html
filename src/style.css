@@ -158,7 +158,7 @@ textarea:focus {
 }
 
 #search-input {
-  flex: 2;
+  flex: 5;
 }
 
 #btn-refresh {
@@ -473,4 +473,12 @@ textarea:focus {
 
 .hidden {
   display: none !important;
+}
+
+.status-find {
+  flex: 1 1 auto;
+}
+
+.status-filter {
+  flex: 2 2 auto;
 }
