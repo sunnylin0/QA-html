@@ -12,10 +12,16 @@
   <div id="app">
     <header>
       <h1>QA 系統</h1>
-      <nav>
-        <button id="tab-report" class="active">回報問題</button>
-        <button id="tab-list">修正列表</button>
-      </nav>
+      <div style="display:flex; align-items:center; gap: 1rem;">
+        <div id="user-info" style="font-size: 0.9rem; color: #555;">
+          Hi, <span id="current-user-name"
+            style="font-weight:bold; color:#2563eb; cursor:pointer; text-decoration:underline;">User</span>
+        </div>
+        <nav>
+          <button id="tab-report" class="active">回報問題</button>
+          <button id="tab-list">修正列表</button>
+        </nav>
+      </div>
     </header>
 
     <main>
@@ -165,6 +171,20 @@
       <button id="btn-prev" class="btn-sm">上一頁</button>
       <span id="page-info">Page 1 of 1</span>
       <button id="btn-next" class="btn-sm">下一頁</button>
+    </div>
+  </div>
+
+  <!-- Login Modal -->
+  <div id="modal-login" class="modal">
+    <div class="modal-content" style="max-width: 400px; text-align: center;">
+      <h3>歡迎使用 QA 系統</h3>
+      <p style="margin-bottom: 1.5rem; color:#666;">請輸入您的姓名以繼續</p>
+      <form id="login-form">
+        <div class="group">
+          <input type="text" id="login-name" placeholder="您的姓名 (例: 王小明)" required style="text-align:center;">
+        </div>
+        <button type="submit" class="btn-primary">進入系統</button>
+      </form>
     </div>
   </div>
 

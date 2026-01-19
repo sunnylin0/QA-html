@@ -37,10 +37,10 @@ function doPost(e) {
         params.url, 
         params.reporter, 
         params.description, 
-        '', // Fixer
-        '', // FixNote
-        timestamp,
-        ''  // FixTime (Empty on create)
+        timestamp, // Col 9: Timestamp
+        '', // Col 10: Fixer
+        '', // Col 11: FixNote
+        ''  // Col 12: FixTime
       ]);
       
       return responseJSON({ status: 'success', message: 'Reported successfully' });
@@ -89,12 +89,12 @@ function doPost(e) {
              params.reporter || currentRow[6],
              // Col 8: Description
              params.description || currentRow[7],
-             // Col 9: Fixer
-             params.fixer || currentRow[8],
-             // Col 10: FixNote
-             params.fixNote || currentRow[9],
-             // Col 11: Timestamp (Report Time)
-             params.timestamp || currentRow[10],
+             // Col 9: Timestamp (Report Time)
+             params.timestamp || currentRow[8],
+             // Col 10: Fixer
+             params.fixer || currentRow[9],
+             // Col 11: FixNote
+             params.fixNote || currentRow[10],
              // Col 12: FixTime
              params.fixTime || currentRow[11]
           ];

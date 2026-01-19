@@ -30,6 +30,12 @@ const closeModal = document.querySelector('.close-modal');
 const fixForm = document.getElementById('fix-form');
 const modalMeta = document.getElementById('modal-issue-info');
 
+// Login Elements
+const modalLogin = document.getElementById('modal-login');
+const loginForm = document.getElementById('login-form');
+const loginNameInput = document.getElementById('login-name');
+const currentUserNameSpan = document.getElementById('current-user-name');
+
 // Pagination Elements
 const paginationControls = document.getElementById('pagination-controls');
 const itemsPerPageSelect = document.getElementById('items-per-page');
@@ -44,6 +50,7 @@ let filteredIssues = []; // For pagination
 let currentFilter = 'All';
 let currentPage = 1;
 let itemsPerPage = 10;
+let currentUser = '';
 
 // --- Initialization ---
 
@@ -51,10 +58,15 @@ if (!API_URL) {
     alert('設定錯誤：找不到 VITE_GOOGLE_APP_SCRIPT_URL 環境變數。\n請檢查 .env 檔案。');
 }
 
-// Restore saved reporter name
-const savedReporter = localStorage.getItem('reporter');
-if (savedReporter) {
-    document.getElementById('reporter-input').value = savedReporter;
+// Check Login
+const savedUser = localStorage.getItem('userName');
+if (savedUser) {
+    currentUser = savedUser;
+    updateUserUI();
+    modalLogin.style.display = 'none'; // Ensure hidden
+} else {
+    // Show Login
+    modalLogin.style.display = 'flex';
 }
 
 // Set default timestamp
@@ -64,6 +76,32 @@ setNowToTimestamp();
 fetchIssues(true);
 
 // --- Event Listeners ---
+
+// Login
+loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = loginNameInput.value.trim();
+    if (name) {
+        currentUser = name;
+        localStorage.setItem('userName', currentUser);
+        updateUserUI();
+        modalLogin.style.display = 'none';
+
+        // Auto-fill forms if empty
+        const reporterInput = document.getElementById('reporter-input');
+        if (!reporterInput.value) reporterInput.value = currentUser;
+    }
+});
+
+// Edit Name
+currentUserNameSpan.addEventListener('click', () => {
+    const newName = prompt('修改姓名:', currentUser);
+    if (newName && newName.trim()) {
+        currentUser = newName.trim();
+        localStorage.setItem('userName', currentUser);
+        updateUserUI();
+    }
+});
 
 // View Toggle
 btnViewCard.addEventListener('click', () => {
@@ -97,7 +135,8 @@ reportForm.addEventListener('submit', async (e) => {
 
     data.timestamp = formatDateForSheet(data.timestamp);
 
-    localStorage.setItem('reporter', data.reporter);
+    // We rely on currentUser, but ensure it's saved to local for next time
+    localStorage.setItem('userName', currentUser);
 
     const payload = {
         action: data.action,
@@ -212,6 +251,17 @@ fixForm.addEventListener('submit', async (e) => {
 
 // --- Functions ---
 
+function updateUserUI() {
+    currentUserNameSpan.textContent = currentUser;
+
+    // Auto-fill Reporter if empty (only in create mode ideally, or if match)
+    const reporterInput = document.getElementById('reporter-input');
+    // If input is empty, fill it. 
+    if (reporterInput && reportAction.value === 'create' && !reporterInput.value) {
+        reporterInput.value = currentUser;
+    }
+}
+
 function setNowToTimestamp() {
     const now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
@@ -221,7 +271,12 @@ function setNowToTimestamp() {
 function resetReportForm() {
     reportForm.reset();
     setNowToTimestamp();
-    document.getElementById('reporter-input').value = localStorage.getItem('reporter') || '';
+
+    // Refill user name
+    if (currentUser) {
+        document.getElementById('reporter-input').value = currentUser;
+    }
+
     reportAction.value = 'create';
     reportId.value = '';
     btnSubmitReport.textContent = '送出回報';
@@ -435,6 +490,7 @@ function renderIssues(reFilter = true, resetPage = true) {
         // Bind click
         const fixBtn = card.querySelector('.btn-fix');
         fixBtn.addEventListener('click', () => openFixModal(issue));
+
         issueGrid.appendChild(card);
     });
 }
@@ -447,19 +503,20 @@ function openFixModal(issue) {
 
     document.getElementById('modal-status').value = issue.Status;
     document.getElementById('modal-timestamp').value = issue.Timestamp || ''; // Report Time
-    document.getElementById('modal-fixer').value = issue.Fixer || '';
+    const fixerInput = document.getElementById('modal-fixer');
+    fixerInput.value = issue.Fixer || '';
     document.getElementById('modal-fixNote').value = issue.FixNote || '';
+
+    // Auto-fill Fixer if empty
+    if (!fixerInput.value && currentUser) {
+        fixerInput.value = currentUser;
+    }
 
     // Set FixTime input
     const fixTimeInput = document.getElementById('modal-fixTime');
     if (issue.FixTime) {
         fixTimeInput.value = parseDateToInput(issue.FixTime);
     } else {
-        // Default to now if empty? Or leave empty? 
-        // User might prefer empty to decide when to correct.
-        // But if status is being changed to Fixed, maybe auto-fill?
-        // For now, leave as is or set to now if empty makes sense for convenience.
-        // Let's set to now for convenience.
         const now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
         fixTimeInput.value = now.toISOString().slice(0, 16);
